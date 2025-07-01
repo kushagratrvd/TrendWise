@@ -1,8 +1,0 @@
-{
-    "cron": [
-      {
-        "path": "/api/generate-trending",
-        "schedule": "0 * * * *"
-      }
-    ]
-  }
