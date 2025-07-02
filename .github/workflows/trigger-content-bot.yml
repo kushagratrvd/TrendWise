@@ -1,0 +1,14 @@
+name: Trigger Content Bot
+
+on:
+  schedule:
+    - cron: '0 * * * *' # every hour
+  workflow_dispatch:
+
+jobs:
+  call-api:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call generate-trending API
+        run: |
+          curl -X GET "https://trend-wise-lr9v.vercel.app/api/generate-trending"
