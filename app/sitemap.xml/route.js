@@ -1,4 +1,4 @@
-import { getArticles } from '../../../lib/mongodb'
+import { getArticles } from '/lib/mongodb'
 
 export async function GET() {
   try {
