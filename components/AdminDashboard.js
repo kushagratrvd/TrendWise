@@ -8,6 +8,8 @@ export default function AdminDashboard({ articles }) {
   const [isGenerating, setIsGenerating] = useState(false)
   const [topic, setTopic] = useState('')
   const [generationStatus, setGenerationStatus] = useState('')
+  const [trendingTopics, setTrendingTopics] = useState([])
+  const [showTrending, setShowTrending] = useState(false)
 
   const handleGenerateArticle = async (e) => {
     e.preventDefault()
@@ -60,6 +62,24 @@ export default function AdminDashboard({ articles }) {
     }
   };
 
+  const fetchTrendingTopics = async () => {
+    setShowTrending((prev) => !prev)
+    if (trendingTopics.length === 0) {
+      try {
+        const res = await fetch('/api/scrape')
+        const data = await res.json()
+        setTrendingTopics(data.googleTrends || [])
+      } catch (err) {
+        setTrendingTopics(['Failed to fetch topics'])
+      }
+    }
+  }
+
+  const handleTopicClick = (selectedTopic) => {
+    setTopic(selectedTopic)
+    setShowTrending(false)
+  }
+
   return (
     <div className="space-y-8">
       <div className="bg-white rounded-lg shadow-md p-6">
@@ -72,15 +92,40 @@ export default function AdminDashboard({ articles }) {
             <label htmlFor="topic" className="block text-sm font-medium text-gray-700 mb-2">
               Trending Topic
             </label>
-            <input
-              type="text"
-              id="topic"
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-              placeholder="Enter a trending topic (e.g., 'AI developments', 'Tech news')"
-              className="input-field"
-              disabled={isGenerating}
-            />
+            <div className="flex gap-2 items-center">
+              <input
+                type="text"
+                id="topic"
+                value={topic}
+                onChange={(e) => setTopic(e.target.value)}
+                placeholder="Enter a trending topic (e.g., 'AI developments', 'Tech news')"
+                className="input-field flex-1"
+                disabled={isGenerating}
+              />
+              <button
+                type="button"
+                onClick={fetchTrendingTopics}
+                className="btn-secondary px-3 py-2 text-sm"
+                disabled={isGenerating}
+              >
+                {showTrending ? 'Hide' : 'Show'} Trending
+              </button>
+            </div>
+            {showTrending && trendingTopics.length > 0 && (
+              <ul className="mt-3 bg-gray-50 border border-gray-200 rounded-lg p-3 space-y-2">
+                {trendingTopics.map((t, idx) => (
+                  <li key={idx}>
+                    <button
+                      type="button"
+                      className="w-full text-left px-2 py-1 hover:bg-primary-100 rounded transition"
+                      onClick={() => handleTopicClick(t)}
+                    >
+                      {t}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
           
           <button
